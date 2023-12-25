@@ -1,21 +1,17 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Text, View } from "../../components/Themed";
-import { popularMovies, topRatedMovies, trendingMovies } from "../../lib/api";
 import { IMovie } from "../../types";
-import Banner from "../../components/shared/banner";
-import { ScrollView, StyleSheet } from "react-native";
-import MovieCard from "../../components/card/movie-card";
+import { genreMovies } from "../../lib/api";
 import Loader from "../../components/shared/loader";
-import { Redirect, useRouter } from "expo-router";
-import { useGlobalContext } from "../../context";
+import { ScrollView, StyleSheet } from "react-native";
+import Banner from "../../components/shared/banner";
+import MovieCard from "../../components/card/movie-card";
 
-export default function Browse() {
-  const [trending, setTrending] = useState<IMovie[]>([]);
-  const [topRated, setTopRated] = useState<IMovie[]>([]);
-  const [popular, setPopular] = useState<IMovie[]>([]);
+export default function Tv() {
+  const [comedy, setComedy] = useState<IMovie[]>([]);
+  const [documentary, setDocumentary] = useState<IMovie[]>([]);
+  const [family, setFamily] = useState<IMovie[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-
-  const { user, account } = useGlobalContext();
 
   useEffect(() => {
     getTrendingMovies();
@@ -25,51 +21,49 @@ export default function Browse() {
 
   const getTrendingMovies = async () => {
     setIsLoading(true);
-    const trending = await trendingMovies();
-    setTrending(trending);
+    const comedy = await genreMovies("tv", 35);
+    setComedy(comedy);
     setIsLoading(false);
   };
 
   const getTopRatedMovies = async () => {
-    const topRated = await topRatedMovies();
-    setTopRated(topRated);
+    const documentary = await genreMovies("tv", 99);
+    setDocumentary(documentary);
   };
 
   const getPopularMovies = async () => {
-    const popular = await popularMovies();
-    setPopular(popular);
+    const family = await genreMovies("tv", 10751);
+    setFamily(family);
   };
 
   if (isLoading) return <Loader />;
-  if (user === null) return <Redirect href={"/auth"} />;
-  if (account === null) return <Redirect href={"/account"} />;
 
   return (
     <ScrollView>
       <View className="flex-1">
-        <Banner movies={trending} />
+        <Banner movies={comedy} />
 
         <View style={styles.row}>
           <View>
-            <Text style={styles.title}>Trending Movies</Text>
+            <Text style={styles.title}>Comedy</Text>
             <ScrollView horizontal contentContainerStyle={{ gap: 15 }}>
-              {trending.map((item) => (
+              {comedy.map((item) => (
                 <MovieCard item={item} key={item.id} />
               ))}
             </ScrollView>
           </View>
           <View>
-            <Text style={styles.title}>Top Rated Movies</Text>
+            <Text style={styles.title}>Documentary</Text>
             <ScrollView horizontal contentContainerStyle={{ gap: 15 }}>
-              {topRated.map((item) => (
+              {documentary.map((item) => (
                 <MovieCard item={item} key={item.id} />
               ))}
             </ScrollView>
           </View>
           <View>
-            <Text style={styles.title}>Popular Movies</Text>
+            <Text style={styles.title}>Family</Text>
             <ScrollView horizontal contentContainerStyle={{ gap: 15 }}>
-              {popular.map((item) => (
+              {family.map((item) => (
                 <MovieCard item={item} key={item.id} />
               ))}
             </ScrollView>
